@@ -1,0 +1,8 @@
+#ifndef Constants_H
+#define Constants_H
+
+const int MAX_HOTELS = 50;
+const int MAX_TRAVELERS = 100;
+const int MAX_REVIEWS = 200;
+
+#endif
