@@ -11,6 +11,9 @@
 #include "Person.h"
 #include "Traveler.h"
 #include "Hotel.h"
+#include "TravelerValidation.h"
+#include <vector>
+
 using namespace std;
 
 void printMenu();
@@ -183,37 +186,67 @@ string generateID(int count)
 
 void addNewTraveler(Traveler travelers[], int& travelerCount)
 {
-    if (travelerCount >= MAX_TRAVELERS)
-    {
+    if (travelerCount >= MAX_TRAVELERS) {
         cout << "Error: System is full." << endl;
         return;
     }
 
     string name, email, state;
 
-    cout << "\n========== ADD NEW TRAVELER ==========" << endl;
-
-    cin.ignore();
+    cout << "\n========== ADD NEW TRAVELER =========="
+         << endl;
 
     cout << "Enter Full Name: ";
-    getline(cin, name);
+    if (!getline(cin, name)) return;
+
+    if (!validTravelerName(name)) {
+        cout << "Error: Name cannot be empty." << endl;
+        return;
+    }
 
     cout << "Enter Email Address: ";
-    getline(cin, email);
+    if (!getline(cin, email)) return;
+
+    if (!validTravelerEmail(email)) {
+        cout << "Error: Invalid email address." << endl;
+        return;
+    }
 
     cout << "Enter State: ";
-    getline(cin, state);
+    if (!getline(cin, state)) return;
 
-    string id = generateID(travelerCount);
+    if (!validTravelerState(state)) {
+        cout << "Error: State cannot be empty." << endl;
+        return;
+    }
+
+    vector<string> existingIDs;
+
+    for (int i = 0; i < travelerCount; ++i) {
+        existingIDs.push_back(
+            travelers[i].getPersonID()
+        );
+    }
+
+    string id = nextTravelerID(existingIDs);
+
+    if (id.empty()) {
+        cout << "Error: No available User ID."
+             << endl;
+        return;
+    }
 
     travelers[travelerCount] =
         Traveler(id, name, email, state, "Bronze", 0);
 
-    travelerCount++;
+    ++travelerCount;
 
-    cout << "\nTraveler registered successfully!" << endl;
-    cout << "Generated User ID: " << id << endl;
+    cout << "\nTraveler registered successfully!"
+         << endl;
+    cout << "Generated User ID: "
+         << id << endl;
 }
+
 
 void printMenu() {
     cout << "\n========== HOTEL REVIEW SYSTEM ==========" << endl;
