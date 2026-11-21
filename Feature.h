@@ -195,6 +195,7 @@ void addNewTraveler(Traveler travelers[], int& travelerCount)
 
     cout << "\n========== ADD NEW TRAVELER =========="
          << endl;
+    cin.ignore();
 
     cout << "Enter Full Name: ";
     if (!getline(cin, name)) return;
