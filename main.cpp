@@ -11,6 +11,7 @@
 #include "Traveler.h"
 #include "Hotel.h"
 #include "Feature.h"
+#include "MenuInput.h"
 using namespace std;
 bool dataLoadSafe = true;
 
@@ -202,15 +203,14 @@ int main() {
   loadTravelers(travelers, travelerCount);
   loadReviews(travelers, travelerCount, hotels, hotelCount);
 
-  int choice = 0;
-  while (choice != 7)
-  {
+int choice = 0;
+while (choice != 7)
+{
     printMenu();
-    if (!(cin >> choice)) {
-        cout << "Please enter a valid number (1-7)." << endl;
-            cin.clear();
-            cin.ignore(10000, '\n');
-            continue;
+
+    if (!readMenuChoice(cin, cout, choice)) {
+        cout << "\nInput ended. Exiting system..." << endl;
+        break;
     }
 
     switch (choice)
