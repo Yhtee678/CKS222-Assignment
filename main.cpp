@@ -116,10 +116,10 @@ int main() {
   cout << "Loading data..." << endl << endl;
 
   //Entity-centric Lifestyle
-  Traveler travelers[MAX_TRAVELERS];
+  static Traveler travelers[MAX_TRAVELERS];
   int travelerCount = 0;
 
-  Hotel hotels[MAX_HOTELS];
+  static Hotel hotels[MAX_HOTELS];
   int hotelCount = 0;
 
   loadTravelers(travelers, travelerCount);
