@@ -81,3 +81,11 @@ for name, count, description in cases:
         print(result.stderr)
 
     print("reviews.txt unchanged:", reviews_after == reviews_data)
+    if name == "H1":
+        assert result.returncode == 0, "50 hotels should load successfully"
+        assert "Loaded reviews and created 50 hotels." in result.stdout
+    else:
+        assert result.returncode != 0, "Hotel overflow must stop the program"
+        assert "Hotel capacity reached" in result.stdout
+        assert reviews_after == reviews_data, "Overflow must not overwrite reviews.txt"
+    print(f"{name}: PASSED")
