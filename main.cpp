@@ -200,8 +200,17 @@ int main() {
   static Hotel hotels[MAX_HOTELS];
   int hotelCount = 0;
 
-  loadTravelers(travelers, travelerCount);
-  loadReviews(travelers, travelerCount, hotels, hotelCount);
+loadTravelers(travelers, travelerCount);
+
+  if (dataLoadSafe) {
+      loadReviews(travelers, travelerCount, hotels, hotelCount);
+  }
+
+  if (!dataLoadSafe) {
+      cerr << "Error: Data loading was incomplete." << endl;
+      cerr << "Original data files will not be overwritten." << endl;
+      return 1;
+  }
 
 int choice = 0;
 while (choice != 7)
