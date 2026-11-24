@@ -44,3 +44,11 @@ for name, count, desc in cases:
     print("Program output:")
     print(r.stdout)
     print("users.txt unchanged  :", after == data)
+    if name == "T1":
+        assert r.returncode == 0, "100 travelers should load successfully"
+        assert "Loaded 100 travelers." in r.stdout
+    else:
+        assert r.returncode != 0, "Overflow must stop the program"
+        assert "Traveler capacity reached" in r.stdout
+        assert after == data, "Overflow must not overwrite users.txt"
+    print(f"{name}: PASSED")
