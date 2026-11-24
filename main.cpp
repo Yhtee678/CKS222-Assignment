@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include <iomanip>
+#include <limits>
 
 #include "Constants.h"
 #include "Review.h"
@@ -12,6 +13,7 @@
 #include "Feature.h"
 #include "MenuInput.h"
 using namespace std;
+bool dataLoadSafe = true;
 
 // =====================================================
 // OPEN "users.txt" FILE EXACTLY AT ONCE
@@ -19,93 +21,168 @@ using namespace std;
 
 void loadTravelers(Traveler travelers[], int& travelerCount)
 {
-  ifstream inFile("users.txt");
-  if (!inFile)
-  {
-    cout << "Error opening users.txt file!" << endl;
-    return;
-  }
+    ifstream inFile("users.txt");
 
-  string id, name, state, email, level;
-  int points;
+    if (!inFile) {
+        cout << "Error opening users.txt file!" << endl;
+        dataLoadSafe = false;
+        return;
+    }
 
-  while(getline(inFile, id, '\t'))
-  {
-    getline(inFile, name, '\t');
-    getline(inFile, state, '\t');
-    getline(inFile, email, '\t');
-    getline(inFile, level, '\t');
-    inFile >> points;
-    inFile.ignore();
+    string id, name, state, email, level;
+    int points;
 
-    Traveler t(id, name, email, state, level, points);
-    travelers[travelerCount] = t;
-    travelerCount++;
-  }
+    while (getline(inFile, id, '\t')) {
 
-  inFile.close();
-  cout << "Loaded " << travelerCount << " travelers." << endl;
+        if (!getline(inFile, name, '\t') ||
+            !getline(inFile, state, '\t') ||
+            !getline(inFile, email, '\t') ||
+            !getline(inFile, level, '\t') ||
+            !(inFile >> points)) {
+            cout << "Warning: Invalid traveler record."
+                 << endl;
+            dataLoadSafe = false;
+            break;
+        }
+
+        inFile.ignore(
+            numeric_limits<streamsize>::max(), '\n'
+        );
+
+        if (travelerCount >= MAX_TRAVELERS) {
+            cout << "Warning: Traveler capacity reached."
+                 << endl;
+            dataLoadSafe = false;
+            break;
+        }
+
+        travelers[travelerCount] =
+            Traveler(id, name, email, state, level, points);
+
+        ++travelerCount;
+    }
+
+    cout << "Loaded " << travelerCount
+         << " travelers." << endl;
 }
 
 // =====================================================
 // OPEN "reviews.txt" FILE EXACTLY AT ONCE
 // =====================================================
 
-void loadReviews(Traveler travelers[], int travelerCount, Hotel hotels[], int &hotelCount)
-{
-  ifstream inFile2("reviews.txt");
-  if (!inFile2)
-  {
-    cout << "Error opening reviews.txt file!" << endl;
-    return;
-  }
+void loadReviews(
+    Traveler travelers[],
+    int travelerCount,
+    Hotel hotels[],
+    int& hotelCount
+) {
+    ifstream inFile("reviews.txt");
 
-string id, hotelName, comment;
-int rating;
+    if (!inFile) {
+        cout << "Error opening reviews.txt file!" << endl;
+        dataLoadSafe = false;
+        return;
+    }
 
-while(getline(inFile2, id, '\t'))
-{
-  inFile2 >> rating;
-  inFile2.ignore();
+    string id, hotelName, comment;
+    int rating;
 
-  getline(inFile2, comment, '\t');
-  getline(inFile2, hotelName);
+    while (getline(inFile, id, '\t')) {
 
-  Review rev(id, hotelName, static_cast<double>(rating), comment);
+        if (!(inFile >> rating)) {
+            cout << "Warning: Invalid review rating."
+                 << endl;
+            dataLoadSafe = false;
+            break;
+        }
 
-        for (int i = 0; i < travelerCount; i++) {
+        inFile.ignore();
+
+        if (!getline(inFile, comment, '\t') ||
+            !getline(inFile, hotelName)) {
+            cout << "Warning: Invalid review record."
+                 << endl;
+            dataLoadSafe = false;
+            break;
+        }
+
+        int tIndex = -1;
+        int hIndex = -1;
+
+        for (int i = 0; i < travelerCount; ++i) {
             if (travelers[i].getPersonID() == id) {
-                travelers[i].addReview(rev);
+                tIndex = i;
                 break;
             }
         }
 
-        int index = -1;
+        for (int i = 0; i < hotelCount; ++i) {
+            if (hotels[i].getHotelName() == hotelName) {
+                hIndex = i;
+                break;
+            }
+        }
 
-         for (int i = 0; i < hotelCount; i++)
-     {
-         if (hotels[i].getHotelName() == hotelName)
-    {
-        index = i;
-        break;
+        if (tIndex == -1) {
+            cout << "Warning: Unknown traveler ID."
+                 << endl;
+            dataLoadSafe = false;
+            continue;
+        }
+
+        if (travelers[tIndex].getReviewCount()
+            >= MAX_REVIEWS) {
+            cout << "Warning: Traveler review capacity reached."
+                 << endl;
+            dataLoadSafe = false;
+            continue;
+        }
+
+        if (hIndex == -1 && hotelCount >= MAX_HOTELS) {
+            cout << "Warning: Hotel capacity reached."
+                 << endl;
+            dataLoadSafe = false;
+            continue;
+        }
+
+        if (hIndex != -1 &&
+            hotels[hIndex].getReviewCount() >= MAX_REVIEWS) {
+            cout << "Warning: Hotel review capacity reached."
+                 << endl;
+            dataLoadSafe = false;
+            continue;
+        }
+
+        Review rev(
+            id,
+            hotelName,
+            static_cast<double>(rating),
+            comment
+        );
+
+        if (hIndex == -1) {
+            hotels[hotelCount] = Hotel(hotelName);
+            hIndex = hotelCount;
+            ++hotelCount;
+        }
+
+        if (!hotels[hIndex].addReview(rev)) {
+            cout << "Warning: Hotel review not loaded."
+                 << endl;
+            dataLoadSafe = false;
+            continue;
+        }
+
+        if (!travelers[tIndex].addReview(rev)) {
+            cout << "Warning: Traveler review not loaded."
+                 << endl;
+            dataLoadSafe = false;
+            continue;
+        }
     }
-}
 
-         if (index == -1)
-     {
-    hotels[hotelCount] = Hotel(hotelName);
-    hotels[hotelCount].addReview(rev);
-    hotelCount++;
-     }
-         else
-{
-    hotels[index].addReview(rev);
-}
-    }
-
-
-    inFile2.close();
-    cout << "Loaded reviews and created " << hotelCount << " hotels." << endl;
+    cout << "Loaded reviews and created "
+         << hotelCount << " hotels." << endl;
 }
 
 // =====================================================
@@ -117,14 +194,23 @@ int main() {
   cout << "Loading data..." << endl << endl;
 
   //Entity-centric Lifestyle
-  Traveler travelers[MAX_TRAVELERS];
+  static Traveler travelers[MAX_TRAVELERS];
   int travelerCount = 0;
 
-  Hotel hotels[MAX_HOTELS];
+  static Hotel hotels[MAX_HOTELS];
   int hotelCount = 0;
 
-  loadTravelers(travelers, travelerCount);
-  loadReviews(travelers, travelerCount, hotels, hotelCount);
+loadTravelers(travelers, travelerCount);
+
+  if (dataLoadSafe) {
+      loadReviews(travelers, travelerCount, hotels, hotelCount);
+  }
+
+  if (!dataLoadSafe) {
+      cerr << "Error: Data loading was incomplete." << endl;
+      cerr << "Original data files will not be overwritten." << endl;
+      return 1;
+  }
 
 int choice = 0;
 while (choice != 7)
@@ -167,6 +253,13 @@ while (choice != 7)
 // =====================================================
 // SAVE "users.txt" FILE EXACTLY AT ONCE
 // =====================================================
+if (!dataLoadSafe) {
+    cout << "Warning: Data loading was incomplete."
+         << endl;
+    cout << "Original data files will not be overwritten."
+         << endl;
+    return 1;
+}
 
  ofstream saveUser("users.txt");
 
