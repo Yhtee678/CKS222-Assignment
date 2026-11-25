@@ -12,6 +12,7 @@
 #include "Traveler.h"
 #include "Hotel.h"
 #include "TravelerValidation.h"
+#include "RatingValidation.h"
 #include <vector>
 
 using namespace std;
@@ -101,14 +102,15 @@ void topReviewers(Traveler travelers[], int travelerCount) {
 
 void addNewReview(Traveler travelers[], int travelerCount, Hotel hotels[], int& hotelCount) {
     string uid, hName, comment;
-    double rating;
+    int rating = 0;
 
     cout << "\n========== SUBMIT NEW REVIEW ==========" << endl;
     cout << "Enter your User ID: ";
-    cin >> uid;
+    if (!getline(cin, uid)) return;
 
     int tIndex = -1;
-    for (int i = 0; i < travelerCount; i++) {
+
+    for (int i = 0; i < travelerCount; ++i) {
         if (travelers[i].getPersonID() == uid) {
             tIndex = i;
             break;
@@ -121,55 +123,98 @@ void addNewReview(Traveler travelers[], int travelerCount, Hotel hotels[], int& 
     }
 
     cout << "Enter Hotel Name: ";
-    cin.ignore();
-    getline(cin, hName);
-    do {
-       cout << "Rating (1-5): ";
-       cin >> rating;
+    if (!getline(cin, hName)) return;
 
-        if (rating < 1 || rating > 5) {
-          cout << "Invalid rating! Please enter between 1 and 5." << endl;
-       }
-    } while (rating < 1 || rating > 5);
+    if (hName.find_first_not_of(" \t\r\n")
+        == string::npos) {
+        cout << "Error: Hotel name cannot be empty."
+             << endl;
+        return;
+    }
+
+    if (!readRating(cin, cout, rating)) {
+        return;
+    }
+
     cout << "Comment: ";
-    cin.ignore();
-    getline(cin, comment);
+    if (!getline(cin, comment)) return;
+
+    // Find existing hotel.
+    int hIndex = -1;
+
+    for (int i = 0; i < hotelCount; ++i) {
+        if (hotels[i].getHotelName() == hName) {
+            hIndex = i;
+            break;
+        }
+    }
+
+    // Check all capacities before making changes.
+    if (travelers[tIndex].getReviewCount()
+        >= MAX_REVIEWS) {
+        cout << "Error: Traveler review storage is full."
+             << endl;
+        return;
+    }
+
+    if (hIndex == -1 && hotelCount >= MAX_HOTELS) {
+        cout << "Error: Hotel storage is full."
+             << endl;
+        return;
+    }
+
+    if (hIndex != -1 &&
+        hotels[hIndex].getReviewCount()
+        >= MAX_REVIEWS) {
+        cout << "Error: Hotel review storage is full."
+             << endl;
+        return;
+    }
 
     Review newRev(uid, hName, rating, comment);
 
-    // 1. Storing the comments.
-    if (travelers[tIndex].addReview(newRev)) {
+    // Store review in hotel collection.
+    if (hIndex == -1) {
+        hotels[hotelCount] = Hotel(hName);
 
-        // --- Rewards are processed here ---
-        int currentPoints = travelers[tIndex].getLoyaltyPoints();
-        travelers[tIndex].setLoyaltyPoints(currentPoints + 100);
-        travelers[tIndex].updateMembershipLevel();
-
-        // 2. Update hotel data
-        int hIndex = -1;
-        for (int i = 0; i < hotelCount; i++) {
-            if (hotels[i].getHotelName() == hName) {
-                hIndex = i;
-                break;
-            }
+        if (!hotels[hotelCount].addReview(newRev)) {
+            cout << "Error: Unable to save hotel review."
+                 << endl;
+            return;
         }
 
-        if (hIndex == -1) {
-            hotels[hotelCount] = Hotel(hName);
-            hotels[hotelCount].addReview(newRev);
-            hotelCount++;
-        } else {
-            hotels[hIndex].addReview(newRev);
+        ++hotelCount;
+    } else {
+        if (!hotels[hIndex].addReview(newRev)) {
+            cout << "Error: Unable to save hotel review."
+                 << endl;
+            return;
         }
-
-        cout << "\nSuccess! Review submitted. +100 Points earned!" << endl;
-        cout << "New Status: " << travelers[tIndex].getMembershipLevel() << endl;
-
     }
 
-    else {
-        cout << "Error: Traveler's review storage is full!" << endl;
+    // Store review in traveler collection.
+    if (!travelers[tIndex].addReview(newRev)) {
+        cout << "Error: Unable to save traveler review."
+             << endl;
+        return;
     }
+
+    // Reward points only after successful submission.
+    int currentPoints =
+        travelers[tIndex].getLoyaltyPoints();
+
+    travelers[tIndex].setLoyaltyPoints(
+        currentPoints + 100
+    );
+
+    travelers[tIndex].updateMembershipLevel();
+
+    cout << "\nSuccess! Review submitted."
+         << " +100 Points earned!" << endl;
+
+    cout << "New Status: "
+         << travelers[tIndex].getMembershipLevel()
+         << endl;
 }
 
 string generateID(int count)
