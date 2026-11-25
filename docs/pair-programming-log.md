@@ -6,11 +6,11 @@
 
 **Participants:** Muaz and Wan Aiman
 
-**Date:** 24/11/2026 - 25/11/2026
+**Date:** 23/11/2026 - 24/11/2026
 
-**Start Time:** 24/11/2026, 11.30 PM 
+**Start Time:** 23/11/2026, 11.30 PM 
 
-**End Time:** 25/11/2026, 12.30 AM 
+**End Time:** 24/11/2026, 12.30 AM 
 
 **Platform:** Discord 
 
@@ -48,6 +48,7 @@ The implementation was retained because the code was clear and no unnecessary du
 - GREEN Commit: [Green Commit](evidence/GREEN-commit.jpg)
 - Pull Request: [View Pull Request #4](https://github.com/Yhtee678/CKS222-Assignment/pull/4#issue-6564673055)
 - Test Output: [Test Output](evidence/Test-Output1.jpg)
+- Test Output Validation: [Test Output Validation](evidence/Test-Output2.jpg)
 
 ## Conclusion
 
