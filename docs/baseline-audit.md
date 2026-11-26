@@ -22,7 +22,7 @@ The original menu used formatted integer extraction (`cin >> choice`). Although 
 
 The original application declared fixed-size arrays of Traveler and Hotel objects inside `main()`. These arrays may exceed the default stack capacity in the Windows environment.
 
-**Observed result:** [Insert actual baseline execution result]
+**Observed result:** The application compiled successfully but terminated during startup with exit code -1073741571 (0xC00000FD), indicating a stack overflow. After increasing the stack size to 16 MB, the application started successfully and displayed the main menu.
 
 **Temporary diagnostic workaround:** Compile with `-Wl,--stack,16777216`.
 
@@ -48,10 +48,10 @@ The original review loader reads ratings using an integer variable, while the Re
 
 | Check | Result |
 |---|---|
-| Original project compilation | [Actual result] |
-| Original project startup | [Actual result] |
-| Mixed menu input `1abc` | [Actual result] |
-| Existing data loading | [Actual result] |
+| Original project compilation | Compiled successfully using G++ with C++17. |
+| Original project startup | Failed with a stack overflow (0xC00000FD) under the default stack configuration. Started successfully after increasing the stack size to 16 MB. |
+| Mixed menu input `1abc` | The original formatted integer extraction could accept the numeric prefix as Option 1. Identified through source code inspection. |
+| Existing data loading | Successfully loaded 10 travelers and 12 hotels after applying the temporary stack size workaround. |
 
 ## 5. Improvement Scope
 
@@ -60,3 +60,13 @@ The team will improve menu input validation, traveler input validation, review/r
 ## 6. Limitations
 
 This audit is based on the inspected source code and the tests actually performed. Potential defects identified through code inspection are not presented as experimentally reproduced failures unless supporting execution evidence exists.
+
+## 7. Baseline Context and Repository Refactoring
+
+This baseline audit documents the original project structure and software quality issues identified before the quality improvement activities.
+
+Following the integration of the quality improvements, the repository was reorganized to separate application source code, header files, persistent data, automated tests and development documentation.
+
+The original file locations and diagnostic commands recorded in this audit are retained for historical reference. Updated compilation instructions, execution commands and testing procedures are available in the current [README](../README.md).
+
+Regression testing was performed before and after the repository restructuring to verify that the existing validation, persistence and capacity tests continued to pass.

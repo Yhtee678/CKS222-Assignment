@@ -2,7 +2,7 @@
 #include <cassert>
 #include <iostream>
 #include <sstream>
-#include "../MenuInput.h"
+#include "MenuInput.h"
 
 void testValidChoices() {
     for (int i = 1; i <= 7; ++i) {

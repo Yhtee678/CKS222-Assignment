@@ -1,3 +1,4 @@
+
 name: TravelGo CI
 
 on:
@@ -8,6 +9,7 @@ jobs:
   build-and-test:
     name: Build and Test
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout repository
@@ -16,35 +18,46 @@ jobs:
       - name: Show compiler version
         run: g++ --version
 
+      - name: Create build directory
+        run: mkdir -p build
+
       - name: Compile TravelGo
         run: |
           g++ -std=c++17 -Wall -Wextra -pedantic \
-          main.cpp -o travelgo
+          -Iinclude src/main.cpp -o build/travelgo
 
       - name: Compile menu validation tests
         run: |
           g++ -std=c++17 -Wall -Wextra -pedantic \
-          tests/test_menu.cpp -o test_menu
+          -Iinclude tests/test_menu.cpp -o build/test_menu
 
       - name: Run menu validation tests
-        run: ./test_menu
+        run: ./build/test_menu
 
       - name: Compile traveler validation tests
         run: |
           g++ -std=c++17 -Wall -Wextra -pedantic \
-          tests/test_traveler.cpp -o test_traveler
+          -Iinclude tests/test_traveler.cpp -o build/test_traveler
 
       - name: Run traveler validation tests
-        run: ./test_traveler
+        run: ./build/test_traveler
 
       - name: Compile rating validation tests
         run: |
           g++ -std=c++17 -Wall -Wextra -pedantic \
-          tests/test_rating.cpp -o test_rating
+          -Iinclude tests/test_rating.cpp -o build/test_rating
 
       - name: Run rating validation tests
-        run: ./test_rating
+        run: ./build/test_rating
 
       - name: Run persistence smoke test
         run: |
-          python3 tests/test_persistence.py ./travelgo
+          python3 tests/test_persistence.py ./build/travelgo
+
+      - name: Run traveler capacity tests
+        run: |
+          python3 tests/test_traveler_capacity.py ./build/travelgo
+
+      - name: Run hotel capacity tests
+        run: |
+          python3 tests/test_hotel_capacity.py ./build/travelgo

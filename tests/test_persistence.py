@@ -1,31 +1,34 @@
+
 import pathlib
 import subprocess
 import sys
 import tempfile
 
-root = pathlib.Path(__file__).resolve().parent.parent
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+DATA_DIR = ROOT / "data"
 
-if len(sys.argv) < 2:
-    print("Usage: python3 tests/test_persistence.py <executable>")
-    sys.exit(2)
+if len(sys.argv) != 2:
+    sys.exit(
+        "Usage: python tests/test_persistence.py <executable>"
+    )
 
 exe = pathlib.Path(sys.argv[1]).resolve()
 
-if not exe.exists():
-    print("Executable not found:", exe)
-    sys.exit(2)
+if not exe.is_file():
+    sys.exit(f"Executable not found: {exe}")
 
 with tempfile.TemporaryDirectory() as temp:
     workdir = pathlib.Path(temp)
+    test_data = workdir / "data"
+    test_data.mkdir()
 
     filenames = ["users.txt", "reviews.txt"]
     before = {}
 
     for name in filenames:
-        source = root / name
-        content = source.read_bytes()
+        content = (DATA_DIR / name).read_bytes()
         before[name] = content
-        (workdir / name).write_bytes(content)
+        (test_data / name).write_bytes(content)
 
     result = subprocess.run(
         [str(exe)],
@@ -33,22 +36,23 @@ with tempfile.TemporaryDirectory() as temp:
         text=True,
         capture_output=True,
         cwd=workdir,
-        timeout=30,
+        timeout=30
     )
 
     if result.returncode != 0:
         print(result.stdout)
         print(result.stderr)
+
         raise AssertionError(
             f"TravelGo exited with {result.returncode}"
         )
 
     for name in filenames:
-        after = (workdir / name).read_bytes()
+        after = (test_data / name).read_bytes()
 
         if after != before[name]:
             raise AssertionError(
-                f"{name} changed after Save & Exit"
+                f"{name} changed after Save and Exit"
             )
 
     print("Persistence smoke test passed!")
