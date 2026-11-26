@@ -46,8 +46,6 @@ The original review loader reads ratings using an integer variable, while the Re
 
 ## 4. Baseline Verification
 
-## 4. Baseline Verification
-
 | Check | Result |
 |---|---|
 | Original project compilation | Compiled successfully using G++ with C++17. |
