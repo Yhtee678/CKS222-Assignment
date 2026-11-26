@@ -1,0 +1,50 @@
+name: TravelGo CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Show compiler version
+        run: g++ --version
+
+      - name: Compile TravelGo
+        run: |
+          g++ -std=c++17 -Wall -Wextra -pedantic \
+          main.cpp -o travelgo
+
+      - name: Compile menu validation tests
+        run: |
+          g++ -std=c++17 -Wall -Wextra -pedantic \
+          tests/test_menu.cpp -o test_menu
+
+      - name: Run menu validation tests
+        run: ./test_menu
+
+      - name: Compile traveler validation tests
+        run: |
+          g++ -std=c++17 -Wall -Wextra -pedantic \
+          tests/test_traveler.cpp -o test_traveler
+
+      - name: Run traveler validation tests
+        run: ./test_traveler
+
+      - name: Compile rating validation tests
+        run: |
+          g++ -std=c++17 -Wall -Wextra -pedantic \
+          tests/test_rating.cpp -o test_rating
+
+      - name: Run rating validation tests
+        run: ./test_rating
+
+      - name: Run persistence smoke test
+        run: |
+          python3 tests/test_persistence.py ./travelgo
