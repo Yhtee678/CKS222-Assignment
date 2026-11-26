@@ -1,7 +1,7 @@
 #include <cassert>
 #include <iostream>
 #include <vector>
-#include "../TravelerValidation.h"
+#include "TravelerValidation.h"
 
 int main() {
     // Name validation

@@ -1,7 +1,7 @@
 #include <sstream>
 #include <cassert>
 #include <iostream>
-#include "../RatingValidation.h"
+#include "RatingValidation.h"
 
 int main() {
     // Valid ratings

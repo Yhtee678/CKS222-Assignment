@@ -1,14 +1,33 @@
-# Compiled C++ executables
-*.exe
-
-# Object files
-*.o
-*.obj
 
 # Build directories
 build/
 cmake-build-*/
 
+# Compiled executables
+*.exe
+*.out
+/travelgo
+/test_menu
+/test_traveler
+/test_rating
+
+# Object files
+*.o
+*.obj
+
+# Python cache
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Generated test directories
+traveler-tests/
+hotel-tests/
+
 # Temporary files
 *.tmp
 *.log
+
+# Operating system files
+.DS_Store
+Thumbs.db

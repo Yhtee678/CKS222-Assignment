@@ -21,7 +21,7 @@ bool dataLoadSafe = true;
 
 void loadTravelers(Traveler travelers[], int& travelerCount)
 {
-    ifstream inFile("users.txt");
+    ifstream inFile("data/users.txt");
 
     if (!inFile) {
         cout << "Error opening users.txt file!" << endl;
@@ -76,7 +76,7 @@ void loadReviews(
     Hotel hotels[],
     int& hotelCount
 ) {
-    ifstream inFile("reviews.txt");
+    ifstream inFile("data/reviews.txt");
 
     if (!inFile) {
         cout << "Error opening reviews.txt file!" << endl;
@@ -261,7 +261,7 @@ if (!dataLoadSafe) {
     return 1;
 }
 
- ofstream saveUser("users.txt");
+ ofstream saveUser("data/users.txt");
 
 for (int i = 0; i < travelerCount; i++)
 {
@@ -279,7 +279,7 @@ saveUser.close();
 // SAVE "reviews.txt" FILE EXACTLY AT ONCE
 // =====================================================
 
-  ofstream saveReview("reviews.txt");
+  ofstream saveReview("data/reviews.txt");
 
 for (int i = 0; i < travelerCount; i++)
 {
@@ -299,7 +299,7 @@ for (int i = 0; i < travelerCount; i++)
 saveReview.close();
   cout << "Saving data..." << endl;
 
-  cout << "Program terminated. Thanks for using our NotTravel system!" << endl;
+  cout << "Program terminated. Thanks for using TravelGo!" << endl;
 
   return 0;
 

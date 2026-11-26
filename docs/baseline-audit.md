@@ -60,3 +60,13 @@ The team will improve menu input validation, traveler input validation, review/r
 ## 6. Limitations
 
 This audit is based on the inspected source code and the tests actually performed. Potential defects identified through code inspection are not presented as experimentally reproduced failures unless supporting execution evidence exists.
+
+## 7. Baseline Context and Repository Refactoring
+
+This baseline audit documents the original project structure and software quality issues identified before the quality improvement activities.
+
+Following the integration of the quality improvements, the repository was reorganized to separate application source code, header files, persistent data, automated tests and development documentation.
+
+The original file locations and diagnostic commands recorded in this audit are retained for historical reference. Updated compilation instructions, execution commands and testing procedures are available in the current [README](../README.md).
+
+Regression testing was performed before and after the repository restructuring to verify that the existing validation, persistence and capacity tests continued to pass.
